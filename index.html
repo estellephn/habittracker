@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PopHabit - Suivi d'Habitudes</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#FF8200">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,7 +20,6 @@
     </nav>
 
     <main id="app">
-        <!-- PAGE 1: CONFIGURATION -->
         <section id="page-setup" class="page active">
             <h1>Bienvenue ! 🧡</h1>
             <input type="text" id="username" placeholder="Ton prénom..." oninput="updateWelcome()">
@@ -26,24 +30,21 @@
             <ul id="habit-list-setup"></ul>
         </section>
 
-        <!-- PAGE 2: SUIVI QUOTIDIEN -->
-       
-<section id="page-daily" class="page">
-    <div class="date-selector-container">
-        <input type="date" id="date-picker" onchange="changeDate(this.value)">
-    </div>
-    
-    <div class="progress-container">
-        <svg viewBox="0 0 36 36" class="circular-chart">
-            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <path id="progress-circle" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <text x="18" y="20.35" class="percentage" id="progress-text">0%</text>
-        </svg>
-    </div>
-    <div id="habit-list-daily"></div>
-</section>
+        <section id="page-daily" class="page">
+            <div class="date-selector-container">
+                <input type="date" id="date-picker" onchange="changeDate(this.value)">
+            </div>
+            
+            <div class="progress-container">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path id="progress-circle" class="circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <text x="18" y="20.35" class="percentage" id="progress-text">0%</text>
+                </svg>
+            </div>
+            <div id="habit-list-daily"></div>
+        </section>
 
-        <!-- PAGE 3: STATISTIQUES -->
         <section id="page-stats" class="page">
             <h2>Vue d'ensemble</h2>
             <select id="stats-filter" onchange="renderStats()">
@@ -51,12 +52,16 @@
                 <option value="month">Ce Mois</option>
                 <option value="year">Cette Année</option>
             </select>
-            <div id="stats-display" class="stats-card">
-                <!-- Contenu généré par JS -->
-            </div>
+            <div id="stats-display" class="stats-card"></div>
         </section>
     </main>
 
     <script src="script.js"></script>
+    <script>
+        // Enregistrement du Service Worker pour le mode hors-ligne
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>
