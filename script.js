@@ -117,115 +117,6 @@ function toggleHabit(habitName) {
     updateProgress();
 }
 
-// --- INITIALISATION DES DONNÉES ---
-let habits = JSON.parse(localStorage.getItem('habits')) || [];
-let history = JSON.parse(localStorage.getItem('habitHistory')) || {};
-let username = localStorage.getItem('username') || "";
-
-let selectedDate = new Date().toISOString().split('T')[0];
-
-document.addEventListener('DOMContentLoaded', () => {
-    const datePicker = document.getElementById('date-picker');
-    if (datePicker) {
-        datePicker.value = selectedDate;
-    }
-    
-    const nameInput = document.getElementById('username');
-    if (nameInput) {
-        nameInput.value = username;
-        updateWelcome();
-    }
-
-    renderSetupList();
-    renderDailyList();
-    updateProgress();
-});
-
-// --- NAVIGATION ---
-function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-' + pageId).classList.add('active');
-    if(pageId === 'stats') renderStats();
-}
-
-// --- ONGLET 1 : CONFIGURATION ---
-function updateWelcome() {
-    username = document.getElementById('username').value;
-    localStorage.setItem('username', username);
-    const welcomeTitle = document.querySelector('#page-setup h1');
-    welcomeTitle.innerText = username ? `Salut, ${username} ! 🧡` : "Bienvenue ! 🧡";
-}
-
-function addHabit() {
-    const input = document.getElementById('new-habit');
-    const name = input.value.trim();
-    
-    if (name && !habits.includes(name)) {
-        habits.push(name);
-        input.value = "";
-        saveAndRefresh();
-    }
-}
-
-function removeHabit(index) {
-    habits.splice(index, 1);
-    saveAndRefresh();
-}
-
-function renderSetupList() {
-    const list = document.getElementById('habit-list-setup');
-    list.innerHTML = habits.map((h, i) => `
-        <li class="habit-item">
-            <span>${h}</span>
-            <span class="delete-btn" onclick="removeHabit(${i})">✖</span>
-        </li>
-    `).join('');
-}
-
-// --- ONGLET 2 : SUIVI QUOTIDIEN ---
-function changeDate(date) {
-    selectedDate = date;
-    renderDailyList();
-    updateProgress();
-}
-
-function renderDailyList() {
-    const container = document.getElementById('habit-list-daily');
-    const doneOnSelectedDate = history[selectedDate] || [];
-
-    if (habits.length === 0) {
-        container.innerHTML = "";
-        return;
-    }
-
-    container.innerHTML = habits.map((h) => `
-        <div class="daily-habit-item">
-            <input type="checkbox" ${doneOnSelectedDate.includes(h) ? 'checked' : ''} 
-                   onchange="toggleHabit('${h}')">
-            <span>${h}</span>
-        </div>
-    `).join('');
-}
-
-function toggleHabit(habitName) {
-    if (!history[selectedDate]) {
-        history[selectedDate] = [];
-    }
-    
-    const index = history[selectedDate].indexOf(habitName);
-    if (index > -1) {
-        history[selectedDate].splice(index, 1);
-    } else {
-        history[selectedDate].push(habitName);
-    }
-    
-    saveData();
-    updateProgress();
-}
-
-/**
- * Met à jour le cercle et anime le texte du pourcentage
- */
 function updateProgress() {
     const progressCircle = document.getElementById('progress-circle');
     const progressText = document.getElementById('progress-text');
@@ -237,34 +128,11 @@ function updateProgress() {
     }
 
     const doneOnSelectedDate = history[selectedDate] || [];
-    const targetPercent = Math.round((doneOnSelectedDate.length / habits.length) * 100);
+    const percent = Math.round((doneOnSelectedDate.length / habits.length) * 100);
     
-    // 1. Mise à jour visuelle du cercle (animation CSS gère la transition)
-    progressCircle.setAttribute('stroke-dasharray', `${targetPercent}, 100`);
-
-    // 2. Animation du texte (compteur numérique)
-    animatePercentage(progressText, targetPercent);
-}
-
-/**
- * Petite fonction utilitaire pour animer le chiffre
- */
-function animatePercentage(element, target) {
-    let current = parseInt(element.innerText) || 0;
-    if (current === target) return;
-
-    const step = target > current ? 1 : -1;
-    const duration = 500; // Doit correspondre à la durée de transition CSS du cercle
-    const intervalTime = Math.abs(duration / (target - current || 1));
-
-    const counter = setInterval(() => {
-        current += step;
-        element.innerText = `${current}%`;
-        
-        if (current === target) {
-            clearInterval(counter);
-        }
-    }, intervalTime);
+    // Mise à jour visuelle du cercle SVG (stroke-dasharray)
+    progressCircle.setAttribute('stroke-dasharray', `${percent}, 100`);
+    progressText.innerText = `${percent}%`;
 }
 
 // --- ONGLET 3 : STATISTIQUES ---
@@ -275,10 +143,12 @@ function renderStats() {
     const datesEnregistrees = Object.keys(history);
     let totalHabitudesRealisees = 0;
     
+    // Calcul du total global
     datesEnregistrees.forEach(date => {
         totalHabitudesRealisees += history[date].length;
     });
 
+    // Calcul de la moyenne
     const nbJours = datesEnregistrees.length;
     const moyenne = nbJours > 0 ? (totalHabitudesRealisees / nbJours).toFixed(1) : 0;
 
@@ -295,7 +165,7 @@ function renderStats() {
     `;
 }
 
-// --- PERSISTENCE ---
+// --- PERSISTENCE DES DONNÉES ---
 function saveData() {
     localStorage.setItem('habits', JSON.stringify(habits));
     localStorage.setItem('habitHistory', JSON.stringify(history));
@@ -307,4 +177,3 @@ function saveAndRefresh() {
     renderDailyList();
     updateProgress();
 }
-
