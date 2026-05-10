@@ -144,3 +144,26 @@ input[type="checkbox"] {
     border-radius: 20px;
     margin-top: 20px;
 }
+
+/* Ajoute ceci à ton fichier CSS */
+.date-selector-container {
+    margin-bottom: 20px;
+}
+
+#date-picker {
+    padding: 10px;
+    border-radius: 12px;
+    border: 2px solid var(--orange-apple);
+    font-family: inherit;
+    font-weight: bold;
+    color: var(--dark);
+    outline: none;
+    cursor: pointer;
+}
+
+/* Optionnel : cacher les habitudes si aucune n'est créée */
+#habit-list-daily:empty::after {
+    content: "Ajoute des habitudes dans l'onglet Configuration ! 📝";
+    color: #888;
+    font-style: italic;
+}
